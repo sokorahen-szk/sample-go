@@ -8,6 +8,11 @@ import (
 	"strconv"
 )
 
+const (
+	appName = "自販機"
+	ps      = "> "
+)
+
 type Coin int
 
 func NewCoin(value int) (*Coin, error) {
@@ -25,7 +30,7 @@ type Bill int
 
 func NewBill(value int) (*Bill, error) {
 	err := errors.New("紙幣じゃないよね？")
-	if !(value == 1000 || value == 5000 || value == 10000) {
+	if !(value == 1000 || value == 2000 || value == 5000 || value == 10000) {
 		return nil, err
 	}
 
@@ -47,22 +52,47 @@ var (
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
+		fmt.Print(ps)
 		scanner.Scan()
 		act := scanner.Text()
 
+		var err error
 		switch act {
-		case "e":
-			break
 		case "into_coins":
 			fmt.Print("硬貨を入れてね：")
-			intoMoney("coins")
+			err = intoMoney("coins")
 			break
 		case "into_bills":
 			fmt.Print("紙幣を入れてね：")
-			intoMoney("bills")
+			err = intoMoney("bills")
 			break
 		case "money":
 			fmt.Println(fmt.Sprintf("所持金：%d", SumBill()+SumCoin()))
+			break
+		case "help":
+			fmt.Println(fmt.Sprintf(`%s の使い方
+into_coins
+　硬貨を入力する。使える硬貨：1円,5円,10円,50円,100円
+
+into_bills
+　紙幣を入力する。使える紙幣：1000円,2000円,5000円,10000円
+
+money
+　所持金を確認する。
+
+e
+　%s 終了する。
+
+help
+　ヘルプを表示する。
+`, appName, appName))
+		}
+
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		if act == "e" {
 			break
 		}
 	}
@@ -80,13 +110,13 @@ func intoMoney(input string) error {
 		if err != nil {
 			return err
 		}
-		coins = res
+		coins = append(coins, res...)
 	} else if input == "bills" {
 		res, err := convertToBill(num)
 		if err != nil {
 			return err
 		}
-		bills = res
+		bills = append(bills, res...)
 	}
 
 	return nil
@@ -157,6 +187,7 @@ func convertToBill(_bills int) ([]*Bill, error) {
 			break
 		}
 	}
+
 	return resources, nil
 }
 
