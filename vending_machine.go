@@ -44,13 +44,45 @@ func NewBill(value int) (*Bill, error) {
 func (b Bill) Int() int       { return int(b) }
 func (b Bill) String() string { return fmt.Sprintf("%d", b.Int()) }
 
+type DrinkName string
+type Drink struct {
+	name  DrinkName
+	price int
+}
+
+const (
+	OrangeJuice DrinkName = "オレンジジュース"
+)
+
+func NewDrink(name DrinkName, price int) *Drink {
+	return &Drink{
+		name:  name,
+		price: price,
+	}
+}
+
+func (i Drink) GetPrice() int {
+	return i.price
+}
+
+func (i Drink) GetName() string {
+	return string(i.name)
+}
+
 var (
-	coins []*Coin
-	bills []*Bill
+	coins  []*Coin
+	bills  []*Bill
+	drinks []*Drink
 )
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
+
+	d := []*Drink{
+		NewDrink(OrangeJuice, 120),
+	}
+	drinks = append(drinks, d...)
+
 	for {
 		fmt.Print(ps)
 		scanner.Scan()
@@ -67,7 +99,7 @@ func main() {
 			err = intoMoney("bills")
 			break
 		case "money":
-			fmt.Println(fmt.Sprintf("所持金：%d", SumBill()+SumCoin()))
+			fmt.Println(fmt.Sprintf("預かり金：%d 円", SumBill()+SumCoin()))
 			break
 		case "help":
 			fmt.Println(fmt.Sprintf(`%s の使い方
@@ -78,7 +110,7 @@ into_bills
 　紙幣を入力する。使える紙幣：1000円,2000円,5000円,10000円
 
 money
-　所持金を確認する。
+　預かり金を確認する。
 
 e
 　%s 終了する。
